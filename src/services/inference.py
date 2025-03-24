@@ -2,6 +2,7 @@ from src.logger import get_logger, log_function_call_debug
 from rasterio.windows import Window
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
+from datetime import datetime
 from ultralytics import YOLO
 from pathlib import Path
 import pandas as pd
@@ -11,9 +12,11 @@ import requests
 import json
 import os 
 
-model = YOLO("../assests/models/s2_ship_detection_yolov8_obb.pt")
+model_path = os.path.join("assets" , "s2_ship_detection_yolov8_obb.pt")
+model = YOLO(model_path)
 logger = get_logger(__name__)
 
+# Tested successfully 
 @log_function_call_debug(logger=logger)
 def authenticate(auth_url, username, password):
     """
@@ -42,8 +45,9 @@ def authenticate(auth_url, username, password):
     else:
         raise Exception("Error Authenticating\nError {}: {}".format(response.status_code, response.text))
 
+# Tested successfully 
 @log_function_call_debug(logger=logger)
-def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max_cloud_cover, search_period_start, search_period_end):
+def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max_cloud_cover, search_period_start : datetime, search_period_end : datetime):
     """
     Query the Copernicus Data Space Ecosystem (CSDE) OData catalogue for specific EO products
 

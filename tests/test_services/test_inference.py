@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import patch, MagicMock
 import requests
+from datetime import datetime
 import json
 from src.logger import get_logger, log_function_call_debug
 from pathlib import Path
@@ -45,7 +46,7 @@ def test_query_catalogue(mock_get):
     mock_get.return_value = mock_response
     
     df = query_catalogue(
-        'http://example.com', 'collection', 'product_type', 'aoi', 10, '2025-01-01', '2025-12-31'
+        'http://example.com', 'collection', 'product_type', 'aoi', 10,  datetime(2025, 1, 1),datetime(2025, 12, 31)
     )
     
     assert isinstance(df, pd.DataFrame)
