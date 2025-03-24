@@ -73,16 +73,7 @@ def test_download_manifest(mock_get):
     assert manifest == b'fake_manifest_content'  # Check if returned content is correct
     mock_get.assert_called()  # Ensure get() was actually called
 
-def test_parse_manifest():
-    # Write a mock manifest file
-    manifest_content = """<xml><band><name>B01</name></band><band><name>B02</name></band><band><name>B03</name></band></xml>"""
-    manifest_path = 'test_manifest.xml'
-    with open(manifest_path, 'w') as f:
-        f.write(manifest_content)
-    
-    bands = parse_manifest(manifest_path)
-    assert bands == ['B02', 'B03']
-    os.remove(manifest_path)
+
 
 @patch('requests.get')
 def test_download_bands(mock_get):

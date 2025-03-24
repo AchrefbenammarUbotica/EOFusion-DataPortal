@@ -130,10 +130,11 @@ def parse_manifest(manifest_path):
 
     try:
         bands = root[0][0][12][0][0]
-    except IndexError:
-        return []
+    except IndexError as e :
+        logger.error("Error Parsing Manifest: Bands not found : {e}")
+        return None
 
-    return [f"{bands[i].text}" for i in range(1,4)]
+    return [f"{bands[i].text}" for i in range(0,3)]
 
 @log_function_call_debug(logger=logger)
 def download_bands(session, product_id, product_name, band_locations, catalogue_url, output_dir, output_name):
