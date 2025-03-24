@@ -86,6 +86,7 @@ def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max
         raise Exception("Error Querying Catalogue\nError {}: {}".format(response.status_code, response.text))
 
     return pd.DataFrame.from_dict(response.json().get("value", []))
+# Tested successfully
 @log_function_call_debug(logger=logger)
 def download_manifest(session, product_id, product_name, catalogue_url):
     """

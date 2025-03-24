@@ -53,16 +53,25 @@ def test_query_catalogue(mock_get):
     assert df.shape[0] == 1
     mock_get.assert_called_once()
 
-@patch('requests.get')
+
+@patch('requests.Session.get')  
 def test_download_manifest(mock_get):
     mock_response = MagicMock()
-    mock_response.status_code = 200
-    mock_response.content = b'fake_content'
-    mock_get.return_value = mock_response
-    
-    manifest = download_manifest(MagicMock(), 'product_id', 'product_name', 'http://example.com')
-    assert manifest == b'fake_content'
-    mock_get.assert_called_once()
+    mock_response.status_code = 200  # Simulate a successful response
+    mock_response.content = b'fake_manifest_content'  # Fake content of the manifest
+    mock_response.text = "Fake manifest file"  # Simulate response text
+    mock_get.return_value = mock_response  # Set the mock response as return value
+
+    # Mock session
+    mock_session = MagicMock()
+    mock_session.get = mock_get  # Ensure session.get() uses the mock
+
+    # Call the function under test
+    manifest = download_manifest(mock_session, 'product_id', 'product_name', 'http://example.com')
+
+    # Assertions
+    assert manifest == b'fake_manifest_content'  # Check if returned content is correct
+    mock_get.assert_called()  # Ensure get() was actually called
 
 def test_parse_manifest():
     # Write a mock manifest file
