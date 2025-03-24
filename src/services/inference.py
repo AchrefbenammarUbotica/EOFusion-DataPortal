@@ -1,3 +1,4 @@
+from src.logger import get_logger, log_function_call_debug
 from rasterio.windows import Window
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
@@ -10,6 +11,10 @@ import requests
 import json
 import os 
 
+
+logger = get_logger(__name__)
+
+@log_function_call_debug(logger=logger)
 def authenticate(auth_url, username, password):
     """
     Authenticate to the API
@@ -37,7 +42,7 @@ def authenticate(auth_url, username, password):
     else:
         raise Exception("Error Authenticating\nError {}: {}".format(response.status_code, response.text))
 
-
+@log_function_call_debug(logger=logger)
 def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max_cloud_cover, search_period_start, search_period_end):
     """
     Query the Copernicus Data Space Ecosystem (CSDE) OData catalogue for specific EO products
@@ -77,7 +82,7 @@ def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max
         raise Exception("Error Querying Catalogue\nError {}: {}".format(response.status_code, response.text))
 
     return pd.DataFrame.from_dict(response.json().get("value", []))
-
+@log_function_call_debug(logger=logger)
 def download_manifest(session, product_id, product_name, catalogue_url):
     """
     Download the manifest of a product from the catalogue and save it to disk in the output directory as a .xml file
@@ -104,7 +109,7 @@ def download_manifest(session, product_id, product_name, catalogue_url):
         raise Exception("Error Downloading Manifest\nError {}: {}".format(response.status_code, response.text))
 
     return response.content
-
+@log_function_call_debug(logger=logger)
 def parse_manifest(manifest_path):
     """
     Parse the manifest of a product
@@ -125,7 +130,7 @@ def parse_manifest(manifest_path):
 
     return [f"{root[0][0][12][0][0][i].text}" for i in range(1,4)]
 
-
+@log_function_call_debug(logger=logger)
 def download_bands(session, product_id, product_name, band_locations, catalogue_url, output_dir, output_name):
     """
     Download the bands of a product and save them to disk in the output directory
@@ -174,7 +179,7 @@ def download_bands(session, product_id, product_name, band_locations, catalogue_
             print(f"Error Downloading Band {band_parts[3]}\nError {response.status_code}: {response.text}")
 
     return bands
-
+@log_function_call_debug(logger=logger)
 def generate_composite_image(bands, jp2_patches_dir, output_dir, output_name):
     """
     Generate a composite image from the bands
@@ -235,6 +240,7 @@ def generate_composite_image(bands, jp2_patches_dir, output_dir, output_name):
     plt.close()
     return output_image_path_rgb
 
+@log_function_call_debug(logger=logger)
 def create_cropped_patches(bands, patch_size=(100,100), output_dir=None, output_name=None, step_size=(100,100)):
     """
     Create cropped patches from the bands
@@ -299,6 +305,7 @@ def create_cropped_patches(bands, patch_size=(100,100), output_dir=None, output_
 
     return patch_names
 
+@log_function_call_debug(logger=logger)
 def save_to_file(data, filename):
     """
     Save data to a file
@@ -310,6 +317,7 @@ def save_to_file(data, filename):
     with open(filename, "wb") as f:
         f.write(data)
 
+@log_function_call_debug(logger=logger)
 def run_ship_detection(image_path):
     """
     Run ship detection on an image
