@@ -1,1 +1,2 @@
 sqlmodel==0.0.24
+pydantic-settings==2.8.1
