@@ -11,7 +11,7 @@ import requests
 import json
 import os 
 
-
+model = YOLO("../assests/models/s2_ship_detection_yolov8_obb.pt")
 logger = get_logger(__name__)
 
 @log_function_call_debug(logger=logger)
@@ -128,7 +128,7 @@ def parse_manifest(manifest_path):
     except IndexError:
         return []
 
-    return [f"{root[0][0][12][0][0][i].text}" for i in range(1,4)]
+    return [f"{bands[i].text}" for i in range(1,4)]
 
 @log_function_call_debug(logger=logger)
 def download_bands(session, product_id, product_name, band_locations, catalogue_url, output_dir, output_name):
@@ -180,12 +180,11 @@ def download_bands(session, product_id, product_name, band_locations, catalogue_
 
     return bands
 @log_function_call_debug(logger=logger)
-def generate_composite_image(bands, jp2_patches_dir, output_dir, output_name):
+def generate_composite_image(jp2_patches_dir, output_dir, output_name):
     """
     Generate a composite image from the bands
 
     Args:
-        bands: list: list of band paths
         jp2_patches_dir: str: path to the JP2 patches directory
         output_dir: str: output directory
         output_name: str: output name
@@ -327,8 +326,6 @@ def run_ship_detection(image_path):
     Returns:
         str: path to the results
     """
-
-    model = YOLO("../assests/models/s2_ship_detection_yolov8_obb.pt")
 
     os.makedirs("./assets/results", exist_ok=True)
 
