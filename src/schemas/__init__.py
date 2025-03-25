@@ -1,1 +1,1 @@
-from . import Vessel, VesselStatus, SatPass, TLE, Satellite
+from .data_schema import Vessel, VesselStatus, SatPass, TLE, Satellite
