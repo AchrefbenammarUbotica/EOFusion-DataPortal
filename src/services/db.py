@@ -1,6 +1,5 @@
 from sqlmodel import SQLModel, create_engine, Session
 from src.config.settings import get_settings
-from src.schemas.data_schema import Vessel, VesselStatus, SatPass, TLE, Satellite
 
 settings = get_settings()
 
