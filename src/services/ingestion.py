@@ -11,45 +11,6 @@ import requests
 settings = get_settings()
 app = Celery("ingestion", broker="redis://localhost:6379/0")
 
-@app.task
-def ingest_dummy_data():
-    with open("data.txt", "r") as f:
-        data = json.load(f)
-
-    with next(get_session()) as session:
-        for i in tqdm(range(len(data))):
-            ship = data[i]
-
-            past_data = session.query(AISData).filter(AISData.mmsi == ship["MMSI"]).all()
-
-            if past_data:
-                if ship["TIME"] == past_data[-1].timestamp:
-                    continue
-
-            ais_data = AISData(
-                mmsi=ship["MMSI"],
-                timestamp=ship["TIME"],
-                latitude=ship["LATITUDE"],
-                longitude=ship["LONGITUDE"],
-                cog=ship["COG"],
-                sog=ship["SOG"],
-                imo=ship["IMO"],
-                heading=ship["ROT"],
-                navstat=ship["NAVSTAT"],
-                name=ship["NAME"],
-                callsign=ship["CALLSIGN"],
-                vessel_type=ship["TYPE"],
-                a=ship["A"],
-                b=ship["B"],
-                c=ship["C"],
-                d=ship["D"],
-                draught=ship["DRAUGHT"],
-                destination=ship["DEST"],
-                eta=ship["ETA"]
-            )
-
-            session.add(ais_data)
-            session.commit()
 
 @app.task
 def ingest_AIS_data():
