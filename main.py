@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from src.services.db import init_db
 from src.routers import ingestion, status
-from src.tasks.task_queue import process_vessel_data, process_passes
+from src.services.process import process_vessel_data, process_passes
 from src.services.ingestion import ingest_AIS_data, fetch_tles
 import pandas as pd
 import uvicorn
