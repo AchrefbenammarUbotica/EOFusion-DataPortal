@@ -47,7 +47,14 @@ def authenticate(auth_url, username, password):
 
 # Tested successfully 
 @log_function_call_debug(logger=logger)
-def query_catalogue(catalogue_odata_url, collection_name, product_type, aoi, max_cloud_cover, search_period_start : datetime, search_period_end : datetime):
+def query_catalogue(
+    catalogue_odata_url : str , 
+    collection_name : str ,
+    product_type : str, 
+    aoi : str, 
+    max_cloud_cover : int , 
+    search_period_start : datetime, 
+    search_period_end : datetime):
     """
     Query the Copernicus Data Space Ecosystem (CSDE) OData catalogue for specific EO products
 
