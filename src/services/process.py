@@ -7,12 +7,14 @@ from src.services.inference import generate_composite_image , run_ship_detection
 from src.services.inference import *
 from src.config.settings import get_settings
 from tqdm import tqdm
+from src.logger import get_logger
 import logging
 
 
+
+
 settings = get_settings()
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("alive_progress")
+logger = get_logger(__name__)
 
 app = Celery('tasks', broker='redis://localhost:6379/0')
 
@@ -31,10 +33,10 @@ def process_vessel_data(self):
     with next(get_session()) as session:
         ais_data = session.query(AISData).all()
         
-        print(len(ais_data))
+        logger.debug(f"Processing {len(ais_data)} AIS data entries")
 
         for data in ais_data:
-            print(f"Processing vessel data for {data.name}")
+            logger.debug(f"Processing vessel data for {data.name}")
             vessel = session.query(Vessel).filter(Vessel.imo == data.imo).first()
 
             if not vessel:
@@ -93,16 +95,20 @@ def process_passes(self):
         for i in tqdm(range(len(vessels))):
         #for vessel in vessels:
             vessel = vessels[i]
-            print(f"processing passes for {vessel.vessel_name}")
+            logger.debug("Processing passes for {vessel.vessel_name}")
             last_pass = session.query(SatPass).filter(SatPass.status_id == vessel.statuses[-1].id).order_by(SatPass.timestamp.desc()).first()
             if last_pass:
                 if datetime.strptime(last_pass.timestamp, "%Y-%m-%d %H:%M:%S %Z") > datetime.strptime(vessel.statuses[-1].freshness, "%Y-%m-%d %H:%M:%S %Z"):
                     continue
 
-            latitude = vessel.statuses[-1].latitude
+            ############################
+            ##This code is Error prone##
+            latitude = vessel.statuses[-1].latitude 
             longitude = vessel.statuses[-1].longitude
             search_date = vessel.statuses[-1].freshness
-
+            ############################
+            
+            
             # Get the closest passes
             closest_passes = get_closest_pass(latitude, longitude, search_date, session.query(TLE).all())
 
@@ -125,8 +131,7 @@ def process_passes(self):
                         f"{east_lon} {north_lat}, {west_lon} {north_lat},"
                         f"{west_lon} {south_lat}))"
                 )
-
-                print(f"Authenticating")
+                logger.debug(f"Authenticating")
                 # Authenticate
                 access_token = authenticate(settings.AUTH_URL, settings.USERNAME, settings.PASSWORD)
                 api_session = requests.Session()
@@ -153,8 +158,7 @@ def process_passes(self):
                     if result.empty:
                         # Skip if no results
                         continue
-
-                    print(f"Downloading manifest data for {vessel.vessel_name}")
+                    logger.debug(f"Downloading manifest data for {vessel.vessel_name}")
                     # Download the manifest
                     for _, record in result.iterrows():
                         product_id = record.iloc[1]
@@ -203,8 +207,8 @@ def process_passes(self):
                         # Create the filename
                         filename = f"{product_id}"
                         filename = filename.replace(".SAFE", "")
-
-                        print(f"Downloading bands for {vessel.vessel_name}")
+                        
+                        logger.debug(f"Downloading bands for {vessel.vessel_name}")
                         # Download bands
                         bands = download_bands(
                                 api_session,
@@ -215,8 +219,7 @@ def process_passes(self):
                                 jp2_patches_dir,
                                 filename
                         )
-
-                        print(f"Creating patches for {vessel.vessel_name}")
+                        logger.debug(f"Creating patches for {vessel.vessel_name}")
                         if not bands is None:
                             patch_names = create_cropped_patches(
                                     bands,
@@ -229,7 +232,7 @@ def process_passes(self):
                         composite_patches = Path.cwd() / "Assets" / "composite_patches"
                         composite_patches.mkdir(exist_ok=True)
 
-                        print(f"Creating composite image for {vessel.vessel_name}")
+                        logger.debug(f"Creating composite image for {vessel.vessel_name}")
                         # Create the composite image
                         # TODO fix this !!! some variables/functions are not declared 
                         for patch_name in patch_names:
@@ -242,7 +245,7 @@ def process_passes(self):
                             )
                             if rgb_path: 
                                 # Run inference
-                                print(f"Running inference for {vessel.vessel_name}")
+                                logger.debug(f"Running inference for {vessel.vessel_name}")
                                 # TODO the result of the ship detection inference isn't being used anywhere 
                                 result_path = run_ship_detection(rgb_path, api_session)
 
