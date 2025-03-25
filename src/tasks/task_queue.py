@@ -18,6 +18,10 @@ logger = logging.getLogger("alive_progress")
 app = Celery('tasks', broker='redis://localhost:6379/0')
 
 @app.task(bind=True, max_retries=3, default_retry_delay=30)
+def process_passes(self):
+    pass 
+
+@app.task(bind=True, max_retries=3, default_retry_delay=30)
 def process_satellite_pass(self, satellite_id: int, target_date: datetime, lat: float, lon: float):
     """
     Process a satellite pass
@@ -33,6 +37,7 @@ def process_satellite_pass(self, satellite_id: int, target_date: datetime, lat: 
         Exception: If the satellite is not found
     """
     pass 
+
 def is_data_valid(data):
     pass 
 
@@ -96,6 +101,3 @@ def process_vessel_data(self):
             session.add(status)
 
 
-@app.task(bind=True, max_retries=3, default_retry_delay=30)
-def process_passes(self):
-    pass 
