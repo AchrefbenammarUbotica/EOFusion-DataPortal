@@ -24,10 +24,10 @@ async def lifespan(app: FastAPI):
     # Background scheduler
     scheduler = BackgroundScheduler()
     # Schedule the job
-    scheduler.add_job(ingest_AIS_data, "interval", minutes=30, next_run_time=datetime.now())
-    scheduler.add_job(process_vessel_data, "interval", minutes=30, next_run_time=datetime.now() + timedelta(minutes=2))
-    scheduler.add_job(process_passes, "interval", minutes=30, next_run_time=datetime.now() + timedelta(minutes=4))
-    scheduler.add_job(fetch_tles, "interval", days=1, next_run_time=datetime.now())
+    scheduler.add_job(ingest_AIS_data, "interval", minutes=30, next_run_time=datetime.now()) # This looks fine 
+    scheduler.add_job(process_vessel_data, "interval", minutes=30, next_run_time=datetime.now() + timedelta(minutes=2)) # This looks fine
+    scheduler.add_job(process_passes, "interval", minutes=30, next_run_time=datetime.now() + timedelta(minutes=4)) # TODO The code for this from the eofusion repo looks odd with typos and missing code
+    scheduler.add_job(fetch_tles, "interval", days=1, next_run_time=datetime.now()) # This one looks fine 
 
     # Start the scheduler
     scheduler.start()
