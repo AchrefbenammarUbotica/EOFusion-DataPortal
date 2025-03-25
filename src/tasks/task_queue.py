@@ -21,22 +21,6 @@ app = Celery('tasks', broker='redis://localhost:6379/0')
 def process_passes(self):
     pass 
 
-@app.task(bind=True, max_retries=3, default_retry_delay=30)
-def process_satellite_pass(self, satellite_id: int, target_date: datetime, lat: float, lon: float):
-    """
-    Process a satellite pass
-
-    Args:
-        satellite_id (int): Satellite ID
-        target_date (datetime.datetime): Target date
-        lat (float): Latitude
-        lon (float): Longitude
-    Returns:
-        dict: Status
-    Raises:
-        Exception: If the satellite is not found
-    """
-    pass 
 
 def is_data_valid(data):
     pass 
