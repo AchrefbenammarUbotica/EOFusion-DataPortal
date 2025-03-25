@@ -71,7 +71,7 @@ def query_catalogue(
     Raises:
         Exception: if the query fails
     """
-    print(f"test/{catalogue_odata_url}")
+    logger.debug(f"test/{catalogue_odata_url}")
     search_period_start = search_period_start.strftime("%Y-%m-%d")
     search_period_end = search_period_end.strftime("%Y-%m-%d")
 
@@ -189,7 +189,7 @@ def download_bands(session, product_id, product_name, band_locations, catalogue_
             bands.append(str(outfile))
 
         else:
-            print(f"Error Downloading Band {band_parts[3]}\nError {response.status_code}: {response.text}")
+            logger.debug(f"Error Downloading Band {band_parts[3]}\nError {response.status_code}: {response.text}")
 
     return bands
 @log_function_call_debug(logger=logger)
@@ -218,23 +218,23 @@ def generate_composite_image(jp2_patches_dir, output_dir, output_name):
         with rasterio.open(blue_path, driver="JP2OpenJPEG") as blue_band:
             blue = blue_band.read(1)
     else:
-        print("Error: Blue band not found")
+        logger.debug("Error: Blue band not found")
 
     if green_path.exists():
         with rasterio.open(green_path, driver="JP2OpenJPEG") as green_band:
             green = green_band.read(1)
     else:
-        print("Error: Green band not found")
+        logger.debug("Error: Green band not found")
 
     if red_path.exists():
         with rasterio.open(red_path, driver="JP2OpenJPEG") as red_band:
             red = red_band.read(1)
     else:
-        print("Error: Red band not found")
+        logger.debug("Error: Red band not found")
 
 
     if red is None or green is None or blue is None:
-        print("Error: Bands not found")
+        logger.debug("Error: Bands not found")
         return []
 
     # Normalize the bands
@@ -287,7 +287,7 @@ def create_cropped_patches(bands, patch_size=(100,100), output_dir=None, output_
 
                 # Check if the patch size is larger than the band size
                 if x_size > full_width or y_size > full_height:
-                    print(f"Error: Patch size is larger than the band size")
+                    logger.debug(f"Error: Patch size is larger than the band size")
                     continue
 
                 # Create the patches
@@ -312,7 +312,7 @@ def create_cropped_patches(bands, patch_size=(100,100), output_dir=None, output_
                             patch_band.write(full_band.read(window=window))
 
         except (rasterio.errors.RasterioIOError, FileNotFoundError) as e:
-            print(f"Error: Band {n} not found: {e}")
+            logger.debug(f"Error: Band {n} not found: {e}")
             continue
 
     return patch_names
