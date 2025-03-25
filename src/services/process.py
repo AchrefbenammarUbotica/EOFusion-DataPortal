@@ -6,8 +6,6 @@ from src.services.calculations import get_closest_pass, add_distance_to_gps
 from src.services.inference import generate_composite_image , run_ship_detection
 from src.services.inference import *
 from src.config.settings import get_settings
-import numpy as np
-import math
 from tqdm import tqdm
 import logging
 
